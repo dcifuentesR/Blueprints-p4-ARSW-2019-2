@@ -6,10 +6,43 @@ var app =(function(){
 	
 	var selectedAuthor;
 	var selectedAuthorBlueprints;
+	var selectedBlueprint;
 	
+	var canvas;
 	
+	var getOffset = function(obj) {
+        var offsetLeft = 0;
+        var offsetTop = 0;
+        do {
+          if (!isNaN(obj.offsetLeft)) {
+              offsetLeft += obj.offsetLeft;
+          }
+          if (!isNaN(obj.offsetTop)) {
+              offsetTop += obj.offsetTop;
+          }   
+        } while(obj = obj.offsetParent );
+        return {left: offsetLeft, top: offsetTop};
+    };
 	
 	return {
+		init:function(){
+			canvas=document.getElementById("canvas"),ctx=canvas.getContext("2d");
+			var offset=getOffset(canvas);
+			if(window.PointerEvent){
+				canvas.addEventListener("pointerdown",function(event){
+					selectedBlueprint["points"].push({x:event.pageX-offset,y:event.pageY-offset});
+					//------------------THIS SHOULD BE CHANGED-------------------------
+					ctx.beginPath();
+					ctx.clearRect(0,0,canvas.width,canvas.height);
+					ctx.moveTo(selectedBlueprint.points[1].x,selectedBlueprint.points[1].y);
+					selectedBlueprint["points"].forEach(function(currentPoint){					
+						ctx.lineTo(currentPoint.x,currentPoint.y);
+					});
+					ctx.stroke();
+					//------------------THIS SHOULD BE CHANGED-------------------------
+				});
+			}
+		},
 		
 		selectAuthor:function(author){
 			apiclient.getBlueprintsByAuthor(author,function(error,blueprints){
@@ -17,19 +50,21 @@ var app =(function(){
 					return console.log("hubo un error");
 				}else{
 					
-						selectedAuthor = blueprints.author;
+						selectedAuthor = author;
 						selectedAuthorBlueprints = blueprints;
 					
 				}
 			})
 		},
-		drawBlueprint:function(author,bprintName,canvas){
+		selectBlueprint:function(bprintName){
+			selectedBlueprint =selectedAuthorBlueprints.find(bprint => bprint.name===bprintName);
+		},
+		drawBlueprint:function(author,bprintName){
 			apiclient.getBlueprintByNameAndAuthor(author,bprintName,function(error,blueprint){
 				if(error){
 					return console.log("hubo un error")
 				}else{
 				console.log(bprintName);
-				var ctx = canvas.getContext("2d");
 				ctx.beginPath();
 				ctx.clearRect(0,0,canvas.width,canvas.height);
 				ctx.moveTo(blueprint.points[1].x,blueprint.points[1].y);
@@ -46,7 +81,7 @@ var app =(function(){
 			console.log(author);
 			bprintTable.empty();
 			this.selectAuthor(author);
-			console.log(typeof selectedAuthorBlueprints);
+			console.log(selectedAuthor);
 			// -------------------MAP TO OBJECT--------------------
 			reducedBPrintList=selectedAuthorBlueprints.map(function(currentBPrint){
 				var bprints={};
@@ -67,7 +102,8 @@ var app =(function(){
 				tr.appendChild(td = document.createElement("td"));
 				var btn = document.createElement("button");
 				btn.type = "button";
-				btn.onclick = () => app.drawBlueprint(author,currentBPrint.name,document.getElementById("canvas"));
+				btn.onclick = () => app.drawBlueprint(selectedAuthor,currentBPrint.name),
+									app.selectBlueprint(currentBPrint.name);
 				btn.innerHTML = "Open";
 				td.appendChild(btn);
 				
