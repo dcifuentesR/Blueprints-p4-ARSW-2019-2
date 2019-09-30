@@ -45,6 +45,7 @@ var app =(function(){
 			app.selectedBlueprint =selectedAuthorBlueprints.find(bprint => bprint.name===bprintName);
 		},
 		drawBlueprint:function(author,bprintName){
+			app.selectBlueprint(bprintName);
 			apiclient.getBlueprintByNameAndAuthor(author,bprintName,function(error,blueprint){
 				if(error){
 					return console.log("hubo un error")
@@ -87,8 +88,7 @@ var app =(function(){
 				tr.appendChild(td = document.createElement("td"));
 				var btn = document.createElement("button");
 				btn.type = "button";
-				btn.onclick = () => app.drawBlueprint(selectedAuthor,currentBPrint.name),
-									app.selectBlueprint(currentBPrint.name);
+				btn.onclick = () => app.drawBlueprint(selectedAuthor,currentBPrint.name);
 				btn.innerHTML = "Open";
 				td.appendChild(btn);
 				
