@@ -6,36 +6,21 @@ var app =(function(){
 	
 	var selectedAuthor;
 	var selectedAuthorBlueprints;
-	var selectedBlueprint;
-	
+	this.selectedBlueprint;
 	var canvas;
-	
-	var getOffset = function(obj) {
-        var offsetLeft = 0;
-        var offsetTop = 0;
-        do {
-          if (!isNaN(obj.offsetLeft)) {
-              offsetLeft += obj.offsetLeft;
-          }
-          if (!isNaN(obj.offsetTop)) {
-              offsetTop += obj.offsetTop;
-          }   
-        } while(obj = obj.offsetParent );
-        return {left: offsetLeft, top: offsetTop};
-    };
-	
 	return {
 		init:function(){
 			canvas=document.getElementById("canvas"),ctx=canvas.getContext("2d");
-			var offset=getOffset(canvas);
 			if(window.PointerEvent){
 				canvas.addEventListener("pointerdown",function(event){
-					selectedBlueprint["points"].push({x:event.pageX-offset,y:event.pageY-offset});
+				console.log(app.selectedBlueprint.name);
+					app.selectedBlueprint["points"].push({x:event.pageX-canvas.getBoundingClientRect().left,y:event.pageY-canvas.getBoundingClientRect().top});
+					console.log(app.selectedBlueprint["points"]);
 					//------------------THIS SHOULD BE CHANGED-------------------------
 					ctx.beginPath();
 					ctx.clearRect(0,0,canvas.width,canvas.height);
-					ctx.moveTo(selectedBlueprint.points[1].x,selectedBlueprint.points[1].y);
-					selectedBlueprint["points"].forEach(function(currentPoint){					
+					ctx.moveTo(app.selectedBlueprint.points[1].x,app.selectedBlueprint.points[1].y);
+					app.selectedBlueprint["points"].forEach(function(currentPoint){					
 						ctx.lineTo(currentPoint.x,currentPoint.y);
 					});
 					ctx.stroke();
@@ -57,7 +42,7 @@ var app =(function(){
 			})
 		},
 		selectBlueprint:function(bprintName){
-			selectedBlueprint =selectedAuthorBlueprints.find(bprint => bprint.name===bprintName);
+			app.selectedBlueprint =selectedAuthorBlueprints.find(bprint => bprint.name===bprintName);
 		},
 		drawBlueprint:function(author,bprintName){
 			apiclient.getBlueprintByNameAndAuthor(author,bprintName,function(error,blueprint){
