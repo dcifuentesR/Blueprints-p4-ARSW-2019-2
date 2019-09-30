@@ -6,21 +6,20 @@ var app =(function(){
 	
 	var selectedAuthor;
 	var selectedAuthorBlueprints;
-	this.selectedBlueprint;
+	var selectedBlueprint;
 	var canvas;
 	return {
 		init:function(){
 			canvas=document.getElementById("canvas"),ctx=canvas.getContext("2d");
 			if(window.PointerEvent){
 				canvas.addEventListener("pointerdown",function(event){
-				console.log(app.selectedBlueprint.name);
-					app.selectedBlueprint["points"].push({x:event.pageX-canvas.getBoundingClientRect().left,y:event.pageY-canvas.getBoundingClientRect().top});
-					console.log(app.selectedBlueprint["points"]);
+				console.log(selectedBlueprint.name);
+					selectedBlueprint["points"].push({x:event.pageX-canvas.getBoundingClientRect().left,y:event.pageY-canvas.getBoundingClientRect().top});
 					//------------------THIS SHOULD BE CHANGED-------------------------
 					ctx.beginPath();
 					ctx.clearRect(0,0,canvas.width,canvas.height);
-					ctx.moveTo(app.selectedBlueprint.points[1].x,app.selectedBlueprint.points[1].y);
-					app.selectedBlueprint["points"].forEach(function(currentPoint){					
+					ctx.moveTo(selectedBlueprint.points[1].x,selectedBlueprint.points[1].y);
+					selectedBlueprint["points"].forEach(function(currentPoint){					
 						ctx.lineTo(currentPoint.x,currentPoint.y);
 					});
 					ctx.stroke();
@@ -42,7 +41,7 @@ var app =(function(){
 			})
 		},
 		selectBlueprint:function(bprintName){
-			app.selectedBlueprint =selectedAuthorBlueprints.find(bprint => bprint.name===bprintName);
+			selectedBlueprint =selectedAuthorBlueprints.find(bprint => bprint.name===bprintName);
 		},
 		drawBlueprint:function(author,bprintName){
 			app.selectBlueprint(bprintName);
@@ -105,6 +104,17 @@ var app =(function(){
 			});
 			
 			bprintTable.append();
+		},
+		
+		saveAndUpdateBPrint:function(){
+			console.log(selectedAuthorBlueprints);
+			return $.ajax({
+				url: "/blueprints/"+selectedBlueprint.author,
+				type: "PUT",
+				data: JSON.stringify(selectedAuthorBlueprints),
+				contentType: "application/json"
+				
+			}).then(app.updateBlueprintList(selectedBlueprint.author));
 		}
 		
 		
