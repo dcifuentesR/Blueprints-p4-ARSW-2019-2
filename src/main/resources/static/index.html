@@ -35,12 +35,18 @@
 		</thead>
 		<tbody id=bprintBody>
 		</tbody>
-
-
 	</table>
+	<div class="row">
+		<h3>
+			<label>Total user points : </label> <label id="labelUserPoints">0</label>
+		</h3>
+	</div>
 	<canvas id="canvas" width="800" height="600">
 	</canvas>
 	<button type="button" onClick="app.saveAndUpdateBPrint()">Save/update</button>
+	<button type="button" onClick="app.createBlueprint()">Create
+		new blueprint</button>
+	<button type="button" onClick="app.deleteBlueprint()">Delete</button>
 
 </body>
 
